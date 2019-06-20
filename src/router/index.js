@@ -15,10 +15,10 @@ export default new Router({
       name: 'AdminHeader',
       redirect: '/adminIndex',
       children: [
-        {path: '/musicManage', name: 'MusicManage', component: MusicManage},
-        {path: '/adminIndex', name: 'AdminIndex', component: AdminIndex},
-        {path: '/userManage', name: 'UserManage', component: UserManage},
-        {path: '/commitManage', name: 'CommitManage', component: CommitManage}
+        {path: '/musicManage', name: 'musicManage', component: MusicManage},
+        {path: '/adminIndex', name: 'adminIndex', component: AdminIndex},
+        {path: '/userManage', name: 'userManage', component: UserManage},
+        {path: '/commitManage', name: 'commitManage', component: CommitManage}
       ]
     }
   ],
