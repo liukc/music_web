@@ -10,35 +10,44 @@
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">添加歌单</h5>
+                <h5 class="modal-title" id="exampleModalLabel" v-if="songList.id === ''">添加歌单</h5>
+                <h5 class="modal-title" v-else>修改歌单</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
               <div class="modal-body">
-                <form action="http://jsonplaceholder.typicode.com/posts" method="post">
+                <!--<form action="http://localhost:8080/musicManage/setSongSheet" method="post" enctype="multipart/form-data" @submit.prevent="">-->
+                <form @submit.prevent="createOrUpdate()">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary" type="button">歌单名称</button>
                   </div>
-                  <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
+                  <input v-model="songList.songListName" type="text" class="form-control"
+                         aria-describedby="basic-addon1" title="输入名称" :placeholder=songList.songListName>
+                  <span class="badge badge-danger ml-2" style="line-height: 30px" v-if="songList.songListName === ''">不能为空</span>
                 </div>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary" type="button">描述信息</button>
                   </div>
-                  <textarea class="form-control" aria-label="With textarea"></textarea>
+                  <textarea v-model="songList.listDesc" class="form-control" aria-label="With textarea" :placeholder=songList.listDesc></textarea>
+                  <span class="badge badge-danger ml-2" style="line-height: 50px" v-if="songList.listDesc === ''">不能为空</span>
                 </div>
-                <div class="input-group mb-3">
+                <div class="input-group mb-3" v-if="songList.id === ''">
                   <div class="input-group-prepend">
                     <button class="btn btn-outline-secondary" type="button">上传封面</button>
                   </div>
-                  <input class="btn btn-outline-secondary form-control" type="file"/>
+                  <input @change="getFile()" class="btn btn-outline-secondary form-control" type="file"/>
+                  <span class="badge badge-danger ml-2" style="line-height: 50px" v-if="songList.coverPic === ''">不能为空</span>
                 </div>
                   <div>
                     <hr>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                    <button type="submit" class="btn btn-primary">添加</button>
+                    <button type="submit" class="btn btn-primary">
+                      <span v-if="songList.id === ''">添加</span>
+                      <span v-else>修改</span>
+                    </button>
                   </div>
                 </form>
               </div>
@@ -50,13 +59,13 @@
       <div class="row">
         <div class="card" style="width: 18rem;" :class="index === 0 ? '': 'ml-4'" v-for="(album, index) in albums" :key="index">
           <div class="card-header">
-            {{album.albumName}}
+            {{album.name}}
           </div>
-          <router-link to="/adminHeader" tag="img" class="card-img-top" :src="album.coverPlot" alt="Card image cap"></router-link>
+          <router-link to="/adminHeader" tag="img" class="card-img-top" :src="album.coverImgUrl" alt="Card image cap"></router-link>
           <div class="card-body">
             <span class="card-title font-weight-light">{{album.author}}</span>
-            <p class="card-text font-italic">{{album.desc}}</p>
-            <footer class="blockquote-footer">{{album.publishDate}}</footer>
+            <p class="card-text font-italic">{{album.description}}</p>
+            <!--<footer class="blockquote-footer">{{album.publishDate}}</footer>-->
           </div>
         </div>
       </div>
@@ -65,11 +74,11 @@
           <div class="card-header">
               <span class="float-left">
           每页显示：
-          <select class="custom-select" style="width: 60px;">
-          <option selected>5</option>
-          <option value="1">10</option>
-          <option value="2">20</option>
-          <option value="3">25</option>
+          <select class="custom-select" style="width: 60px;" v-model="pageNumber">
+          <option selected value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
         </select>
             </span>
             <span class="font-weight-bold" style="font-size: 20px; ">全部歌单</span>
@@ -82,22 +91,22 @@
             <table class="table table-hover">
               <thead>
               <tr>
-                <th scope="col">#</th>
+                <th scope="col">歌单id</th>
+                <th scope="col">作者id</th>
                 <th scope="col">歌单名称</th>
-                <th scope="col">作者</th>
-                <th scope="col">歌单标签</th>
-                <th scope="col">创建时间</th>
+                <th scope="col">歌单描述</th>
                 <th scope="col"><button type="button" class="btn btn-primary">删除一页</button></th>
               </tr>
               </thead>
               <tbody>
-              <tr v-for="(song, index) in songs" :key="index">
-                <th scope="row"> {{index+1}}</th>
-                <td>{{song.songName}}</td>
-                <td>{{song.singer}}</td>
-                <td>{{song.songType}}</td>
-                <td>{{song.createDate}}</td>
-                <td><a href="#" class="card-link">删除</a><a href="#" class="card-link">修改</a></td>
+              <tr v-for="(single, index) in songSheet" :key="index">
+                <th scope="row"> {{single.id}}</th>
+                <td>{{single.creatorId}}</td>
+                <td>{{single.name}}</td>
+                <td>{{single.description}}</td>
+                <td><button class="btn btn-link" @click="songList.id = single.id, deleteSongList()">删除</button>
+                  <button data-toggle="modal" data-target="#exampleModal" class="btn btn-link"
+                          @click="songList.id = single.id, songList.songListName = single.name, songList.listDesc = single.description">修改</button></td>
               </tr>
               </tbody>
             </table>
@@ -107,27 +116,6 @@
         </div>
       </div>
       <div class="mt-2" style="margin-left: -15px; width: 912px">
-        <!--<div class="alert alert-secondary" role="alert" style="width: 910px; text-align: right;">-->
-          <!--&lt;!&ndash; Example single danger button &ndash;&gt;-->
-          <!--<div class="btn-group">-->
-            <!--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
-              <!--歌曲搜索-->
-            <!--</button>-->
-            <!--<div class="dropdown-menu">-->
-              <!--<a class="dropdown-item" href="#">歌曲下载</a>-->
-              <!--<a class="dropdown-item" href="#">歌单搜索</a>-->
-              <!--<a class="dropdown-item" href="#">歌单下载</a>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</div>-->
-        <!--<div class="card text-center ">-->
-          <!--<div class="card-header">-->
-            <!--歌曲搜索条形图-->
-          <!--</div>-->
-          <!--<div class="card-body">-->
-            <!--这是一张条形图-->
-          <!--</div>-->
-        <!--</div>-->
         <div class="mt-5">
           <div class="alert alert-secondary" role="alert" style="width: 910px; text-align: right;">
             <!-- 激活 modal -->
@@ -145,18 +133,12 @@
                     </button>
                   </div>
                   <div class="modal-body">
-                    <form action="http://jsonplaceholder.typicode.com/posts" method="post">
+                    <form @submit.prevent="uploadSong()">
                       <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                          <button class="btn btn-outline-secondary" type="button">歌曲名称</button>
+                          <button class="btn btn-outline-secondary" type="button">上传歌曲</button>
                         </div>
-                        <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
-                      </div>
-                      <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                          <button class="btn btn-outline-secondary" type="button">选择歌曲</button>
-                        </div>
-                        <input class="btn btn-outline-secondary form-control" type="file"/>
+                        <input @change="getSong()" class="btn btn-outline-secondary form-control" type="file"/>
                       </div>
                       <div>
                         <hr>
@@ -174,11 +156,11 @@
             <div class="card-header">
               <span class="float-left">
           每页显示：
-          <select class="custom-select" style="width: 60px;">
+          <select class="custom-select" style="width: 60px;" v-model="songPageNumber">
           <option selected>5</option>
-          <option value="1">10</option>
-          <option value="2">20</option>
-          <option value="3">25</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
         </select>
             </span>
               <span class="font-weight-bold" style="font-size: 20px; ">曲库</span>
@@ -193,20 +175,20 @@
                 <tr>
                   <th scope="col">#</th>
                   <th scope="col">歌名</th>
-                  <th scope="col">作者</th>
                   <th scope="col">歌曲类型</th>
-                  <th scope="col">上架时间</th>
                   <th scope="col"><button type="button" class="btn btn-primary">删除一页</button></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="(song, index) in songs" :key="index">
-                  <th scope="row"> {{index+1}}</th>
-                  <td>{{song.songName}}</td>
-                  <td>{{song.singer}}</td>
-                  <td>{{song.songType}}</td>
-                  <td>{{song.createDate}}</td>
-                  <td><a href="#" class="card-link">删除</a><a href="#" class="card-link">修改</a></td>
+                  <td>{{song.id}}</td>
+                  <td>{{song.name}}</td>
+                  <td>{{song.type}}</td>
+                  <td>
+                    <button class="btn btn-link" @click="songPlay.id = song.id, deleteSong()">删除</button>
+                    <button class="btn btn-link" data-toggle="modal" data-target="#playerModal" @click="songPlay.name = song.name, musicPlayer(song.url)">播放</button>
+                    <!-- Modal -->
+                  </td>
                 </tr>
                 </tbody>
               </table>
@@ -216,47 +198,203 @@
           </div>
         </div>
       </div>
+      <div class="modal fade" id="playerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="palyModalLabel">{{songPlay.name}}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <audio id="myAudio" controls="controls">
+                <source :src="songPlay.url" type="audio/mpeg">
+              </audio>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="musicPause()">关闭</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 </template>
 
 <script>
-import Index from 'element-ui/src/utils/popup'
+import axios from '../../API/axios-auth'
 export default {
   name: 'MusicManage',
-  components: {Index},
   data () {
     return {
       counter: 0,
-      albums: [
-        {
-          coverPlot: require('../../assets/adminImage/6.jpg'),
-          author: '张学友',
-          albumName: '雪狼湖',
-          publishDate: '2016-04-05',
-          desc: '这是一张关于人狼之恋的专辑'
-        },
-        {
-          coverPlot: require('../../assets/adminImage/5.jpg'),
-          author: 'LadyGaGa',
-          albumName: 'love story',
-          publishDate: '2017-05-05',
-          desc: 'how are you? I am fine, thanks. how are you? i am ok'
-        },
-        {
-          coverPlot: require('../../assets/adminImage/7.jpg'),
-          author: '蔡徐坤',
-          albumName: '鸡你太美',
-          publishDate: '2019-03-01',
-          desc: '我喜欢唱，跳， rap， 篮球。 music..'
+      songList: {
+        id: '',
+        songListName: '',
+        listDesc: '',
+        coverPic: ''
+      }, // 接收表单数据，用于上传数据到后台
+      pages: 0, // 当前页数
+      songPages: 0, // 当前歌曲页数
+      formCom: {
+        formData: '',
+        conf: ''
+      },
+      song: '',
+      // 获取返回数据
+      albums: [],
+      allSongSheet: [], // 获取从后端传输过来的所有数据
+      songSheet: [], // 获取一页数据
+      pageNumber: '', // 一页数据显示多少条数据
+      songPageNumber: '', // 一页显示多少条歌曲数据
+      songs: [], // 获取一页歌曲数据
+      songPlay: {
+        name: '',
+        id: ''
+      },
+      allSongs: []
+    }
+  },
+  watch: {
+    pageNumber: function (newPageNumber, oldPageNumber) {
+      this.songSheet = this.allSongSheet.slice(0, newPageNumber)
+    },
+    songPageNumber: function (newSongPageNumber, oldSongPageNumber) {
+      this.songs = this.allSongs.slice(0, newSongPageNumber)
+    }
+  },
+  created () {
+    // 获取歌单数据
+
+    axios.get('/musicManage/getSongSheetsByPages?pages=' + this.pages).then((res) => {
+      this.albums = res.data.detail.songLists.slice(0, 3)
+      this.allSongSheet = res.data.detail.songLists
+      this.songSheet = this.allSongSheet.slice(0, 5)
+    })
+    axios.get('/musicManage/getSongsByPages?pages=' + this.songPages).then((res) => {
+      console.log(res)
+      this.allSongs = res.data.detail.songs
+      this.songs = this.allSongs.slice(0, 20)
+    })
+  },
+  methods: {
+    getFile: function () {
+      // 把图片绑定到songLIst的coverPic
+      this.songList.coverPic = event.target.files[0]
+    },
+    getSong: function () {
+      this.song = event.target.files[0]
+    },
+    simulateForm: function () {
+      // 模拟表单操作
+      let formData = new FormData()
+      formData.append('songListName', this.songList.songListName)
+      formData.append('listDesc', this.songList.listDesc)
+      if (this.songList.id === '') {
+        formData.append('coverPic', this.songList.coverPic)
+      } else {
+        formData.append('id', this.songList.id)
+      }
+      let config = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-      ],
-      songs: [
-        {songName: '透明的世界', singer: '秦基博', songType: '摇滚', createDate: '2016-05-04'},
-        {songName: '直到世界尽头', singer: 'WANDS', songType: '流行音乐', createDate: '2016-06-04'},
-        {songName: '好想大声说爱你', singer: 'BAAD', songType: '治愈系', createDate: '2017-05-04'},
-        {songName: 'Monsters', singer: 'Katie Sky', songType: '流行音乐', createDate: '2018-05-04'},
-        {songName: '邂逅', singer: '7!!', songType: '欧美风', createDate: '2016-05-14'}
-      ]
+      }
+      this.formCom.formData = formData
+      this.formCom.conf = config
+    },
+    createOrUpdate: function () {
+      console.log(this.songList.id)
+      if (this.songList.id === '') {
+        this.postSongList()
+      } else {
+        this.updateSongList()
+      }
+    },
+    // 创建歌单
+    postSongList: function () {
+      this.simulateForm()
+      axios.post('/musicManage/setSongSheet', this.formCom.formData, this.formCom.config).then((res) => {
+        if (res.data.code === 200) {
+          alert('创建成功')
+        } else {
+          alert(res.data.message)
+        }
+        // 刷新页面
+        this.$router.go(0)
+      })
+    },
+    // 修改歌单
+    updateSongList: function () {
+      this.simulateForm()
+      console.log(123246)
+      axios.post('/musicManage/putSongSheetbyId', this.formCom.formData).then((res) => {
+        if (res.data.code === 200) {
+          alert('修改成功')
+        } else {
+          alert('修改失败')
+        }
+        // 刷新页面
+        this.$router.go(0)
+      })
+    },
+    // 删除表单
+    deleteSongList: function () {
+      let form = new FormData()
+      form.append('id', this.songList.id)
+      axios.post('/musicManage/deleteSongSheetById', form).then((res) => {
+        console.log(this.songList.id)
+        if (res.data.code === 200) {
+          alert('删除成功')
+        } else {
+          alert('删除失败')
+        }
+        // 刷新页面
+        this.$router.go(0)
+      })
+    },
+    // 上传歌曲
+    uploadSong: function () {
+      let formData = new FormData()
+      formData.append('song', this.song)
+      let config = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+      axios.post('/musicManage/uploadSong', formData, config).then((res) => {
+        if (res.data.code === 200) {
+          alert('上传成功')
+        } else {
+          alert('上传失败')
+        }
+        // 刷新页面
+        this.$router.go(0)
+      })
+    },
+    // 音乐播放
+    musicPlayer: function (url) {
+      let audio = document.getElementById('myAudio')
+      audio.src = url
+      audio.play()
+    },
+    musicPause: function () {
+      let audio = document.getElementById('myAudio')
+      audio.pause()
+      audio.load()
+    },
+    deleteSong: function () {
+      let form = new FormData()
+      form.append('id', this.songPlay.id)
+      axios.post('/musicManage/deleteSongById', form).then((res) => {
+        if (res.data.code === 200) {
+          alert('删除成功')
+        } else {
+          alert('删除失败')
+        }
+        // 刷新页面
+        this.$router.go(0)
+      })
     }
   }
 }

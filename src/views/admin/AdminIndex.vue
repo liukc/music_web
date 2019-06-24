@@ -1,14 +1,14 @@
 <template>
     <div class="ml-5">
       <div class="row">
-        <div class="card col-sm-3">
+        <div class="card col-sm-4">
           <div class="card-body">
             <img src="../../assets/adminImage/1.jpg" height="80" width="100" alt="Card image cap">
             <h5 class="card-title mt-2">今日访问量</h5>
             <h6 class="card-subtitle mb-2 text-muted">{{visitors}}</h6>
           </div>
         </div>
-        <div class="card col-sm-3 ml-3">
+        <div class="card col-sm-3 ml-4">
           <div class="card-body">
             <img src="../../assets/adminImage/2.jpg" height="80" width="100" alt="Card image cap">
             <h5 class="card-title mt-2">新用户</h5>
