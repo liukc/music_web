@@ -1,6 +1,6 @@
 <template>
   <div class="backBlank">
-    <form>
+    <form @submit="registerToManager()">
       <div class="form-group row">
         <label for="inputaccount3" class="col-sm-3 col-form-label">手机号码</label>
         <div class="col-sm-9">
@@ -10,16 +10,16 @@
       <div class="form-group row">
         <label for="inputpassword3" class="col-sm-3 col-form-label">电子邮箱</label>
         <div class="col-sm-9">
-          <input type="password" class="form-control" id="inputpassword3" placeholder="输入电子邮箱">
+          <input type="email" class="form-control" id="inputpassword3" placeholder="输入电子邮箱">
         </div>
       </div>
       <div class="form-group row">
         <label for="repeatpassword3" class="col-sm-3 col-form-label">身份证号</label>
         <div class="col-sm-9">
-          <input type="password" class="form-control" id="repeatpassword3" placeholder="输入身份证号">
+          <input type="text" class="form-control" id="repeatpassword3" placeholder="输入身份证号">
         </div>
       </div>
-      <button type="submit" class="btn btn-primary btn-lg btn-block mt-5" @click="registerToManager()">注册成为管理员</button>
+      <button type="submit" class="btn btn-primary btn-lg btn-block mt-5">注册成为管理员</button>
     </form>
   </div>
 </template>
@@ -30,6 +30,7 @@ export default {
   name: 'Register',
   methods: {
     registerToManager: function () {
+      console.log('beieie')
       var userStr = sessionStorage.getItem('user')
       var user = JSON.parse(userStr)
       let form = new FormData()
