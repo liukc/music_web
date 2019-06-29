@@ -8,8 +8,32 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.config.productionTip = false
+
 Vue.use(ElementUI)
 /* eslint-disable no-new */
+
+router.beforeEach((to, from, next) => {
+  var userStr = sessionStorage.getItem('user')
+  var user = JSON.parse(userStr)
+  if (to.path === '/login' || to.path === '/register' || to.path === '/') {
+    if (user === null) {
+      next()
+    } else {
+      alert('请先注销')
+    }
+  } else {
+    if (user === null) {
+      alert('请先登陆')
+      next('/login')
+    } else {
+      if (user.userType === 0) {
+        next()
+      } else {
+        alert('权限不够')
+      }
+    }
+  }
+})
 new Vue({
   el: '#app',
   router,

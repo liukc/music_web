@@ -234,8 +234,8 @@ export default {
         listDesc: '',
         coverPic: ''
       }, // 接收表单数据，用于上传数据到后台
-      pages: 0, // 当前页数
-      songPages: 0, // 当前歌曲页数
+      pages: 1, // 当前页数
+      songPages: 1, // 当前歌曲页数
       formCom: {
         formData: '',
         conf: ''
