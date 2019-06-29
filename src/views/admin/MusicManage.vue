@@ -272,7 +272,6 @@ export default {
       this.songSheet = this.allSongSheet.slice(0, 5)
     })
     axios.get('/musicManage/getSongsByPages?pages=' + this.songPages).then((res) => {
-      console.log(res)
       this.allSongs = res.data.detail.songs
       this.songs = this.allSongs.slice(0, 20)
     })
@@ -286,10 +285,13 @@ export default {
       this.song = event.target.files[0]
     },
     simulateForm: function () {
+      var userStr = sessionStorage.getItem('user')
+      var user = JSON.parse(userStr)
       // 模拟表单操作
       let formData = new FormData()
       formData.append('songListName', this.songList.songListName)
       formData.append('listDesc', this.songList.listDesc)
+      formData.append('id', user.id)
       if (this.songList.id === '') {
         formData.append('coverPic', this.songList.coverPic)
       } else {

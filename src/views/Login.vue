@@ -46,7 +46,6 @@ export default {
       formData.append('username', this.user.username)
       formData.append('password', this.user.password)
       axios.post('/userManage/login', formData).then((res) => {
-        console.log(res)
         if (res.data.code === 200) {
           sessionStorage.setItem('user', JSON.stringify(res.data.detail.user))
           // console.log(sessionStorage.getItem('user'))

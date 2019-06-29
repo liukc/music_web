@@ -15,11 +15,18 @@ Vue.use(ElementUI)
 router.beforeEach((to, from, next) => {
   var userStr = sessionStorage.getItem('user')
   var user = JSON.parse(userStr)
-  if (to.path === '/login' || to.path === '/register' || to.path === '/') {
+  if (to.path === '/login' || to.path === '/') {
     if (user === null) {
       next()
     } else {
       alert('请先注销')
+    }
+  } else if (to.path === '/register') {
+    if (user === null) {
+      alert('请先登录')
+      next('/login')
+    } else {
+      next()
     }
   } else {
     if (user === null) {
@@ -29,7 +36,8 @@ router.beforeEach((to, from, next) => {
       if (user.userType === 0) {
         next()
       } else {
-        alert('权限不够')
+        alert('权限不够，申请为管理员')
+        next('/register')
       }
     }
   }
