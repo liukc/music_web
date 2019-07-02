@@ -14,7 +14,7 @@
         <h5 class="card-header">访问量统计</h5>
         <div class="card-body">
 
-          <img src="../../assets/adminImage/10.jpg" height="400" width="850"/></div>
+          <img src="../../assets/adminImage/9.jpg" height="400" width="850"/></div>
       </div>
     </div>
     <div class="mt-2 mb-5" style="margin-left: -15px">
